@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding:utf-8 -*-
 ###
 # Created Date: 2022-03-18 11:18:44
 # Author: Bin Wang
@@ -7,21 +5,18 @@
 # Copyright (c) 2022 National University of Singapore
 # 
 # -----
-# HISTORY:
-# Date&Time 			By	Comments
-# ----------			---	----------------------------------------------------------
+# Modified by pierremarchal
 ###
 
-import sys
-import logging
 import argparse
+import logging
+import sys
 
 import w_data_loader
-import w_model
 import w_evaluation
+import w_model
 
-logging.basicConfig(format='%(asctime)s : %(message)s', level=logging.INFO)
-
+logging.basicConfig(level=logging.DEBUG)
 
 if __name__ == "__main__":
 
@@ -38,6 +33,11 @@ if __name__ == "__main__":
                         help="vocabulary used for background: basic, wiki")
     parser.add_argument("--post_process", type=str, default=None,
                         help="whether to do post-processing on word embedding")
+    parser.add_argument("--skip_oov", action='store_true',
+                        help="skip test if source vector or target vector is missing; also ignore background words not"
+                             "in the model")
+    parser.add_argument("--output", type=str, default="res.json",
+                        help="output file (JSON)")
     config = parser.parse_args()
 
     # - - - - - - - - - - - - - - - - -
@@ -60,10 +60,10 @@ if __name__ == "__main__":
     logging.info("")
 
     # - - - - - - - - - - - - - - - - -
-    # load data
-    word_pairs_data = w_data_loader.Word_dataset_loader(config)
     # load embedding model
     word_emb_model = w_model.Word_embedding_model(config)
+    # load data
+    word_pairs_data = w_data_loader.Word_dataset_loader(config, model=word_emb_model)
     # evaluation
     our_evaluator = w_evaluation.Word_emb_evaluator(config, word_pairs_data, word_emb_model)
     our_evaluator.eval()
