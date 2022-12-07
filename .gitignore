@@ -136,3 +136,4 @@ debug.sh
 record.sh
 
 cache/
+/.idea/
