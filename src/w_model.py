@@ -16,18 +16,17 @@ import numpy as np
 from sklearn.decomposition import PCA
 
 
-class Word_embedding_model:
-    """ wrapper for word embedding models """
+class WordEmbeddingModel:
+    """
+    wrapper for word embedding models
+    """
 
     def __init__(self, config) -> None:
         """ initializable for word embedding model, save vocab, embedding """
-
         self.word_emb_path = config.word_emb_model
         self.name = Path(config.word_emb_model).stem
 
-        logging.info("")
         logging.info("*** Word Embedding Model Initialization ***")
-
         self.word2id = {}
         self.vocab = None
         self.word_emb = None
@@ -37,7 +36,7 @@ class Word_embedding_model:
 
         self.read_word_embs()
 
-        if config.post_process == 'True':
+        if config.post_process:
             self.post_processing_embs()
 
         self.wvec_dim = self.word_emb.shape[1]
@@ -46,9 +45,8 @@ class Word_embedding_model:
             self.word_emb = self.word_emb - self.word_emb.mean(axis=0, keepdims=True)
             self.word_emb_avg = np.mean(self.word_emb, axis=0)
 
-        if config.normalization == True:
+        if config.normalization:
             self.normalizing_word_vectors()
-        logging.info('Note: out-of-vocab words, the average embedding is returned.')
 
     def read_word_embs(self):
         """ read the original word embedding """
@@ -95,18 +93,15 @@ class Word_embedding_model:
         u = PCA(n_components=pp_comp).fit(word_emb_np_tilda).components_
         new_word_emb_np = word_emb_np_tilda - (word_emb_np_tilda @ u.T @ u)
 
-        logging.info('Embedding set: {} words with {} dimensions after post processing'.format(new_word_emb_np.shape[0],
-                                                                                               new_word_emb_np.shape[
-                                                                                                   1]))
+        logging.info('Embedding set: {} words with {} dimensions after '
+                     'post processing'.format(new_word_emb_np.shape[0], new_word_emb_np.shape[1]))
 
         self.word_emb = new_word_emb_np
         self.word_emb_avg = np.mean(new_word_emb_np, axis=0)
 
     def normalizing_word_vectors(self):
         """ normalizing word vectors """
-
         logging.info('Normalizing word vectors')
-
         self.word_emb = self.word_emb / np.linalg.norm(self.word_emb, axis=1)[:, np.newaxis]
         self.word_emb_avg = np.mean(self.word_emb, axis=0)
 
