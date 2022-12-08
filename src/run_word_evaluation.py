@@ -17,7 +17,7 @@ import w_data_loader
 import w_evaluation
 import w_model
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
